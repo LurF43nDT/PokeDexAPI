@@ -10,8 +10,9 @@ let allPokemons = []
 fetch(`https://pokeapi.co/api/v2/pokemon?limit=${MAX_POKEMON}`)
 .then((Response) => Response.json())
 .then((data) => {
-    allPokemons = data.results;
-});
+    allPokemons = data.results
+    displayPokemons(allPokemons)
+})
 
 async function fetchPokemonDataBeforeRedirect(id) {
 try {
@@ -51,6 +52,32 @@ function displayPokemons(pokemon) {
     })
 
     listWrapper.appendChild(listItem)
-
     })
+}
+
+searchInput.addEventListener("keyup", handleSearch)
+
+function handleSearch() {
+    const searchTerm = searchInput.value.toLocaleLowerCase()
+    let filteredPokemons
+
+    if (numberFilter.checked) {
+        filteredPokemons = allPokemons.filter((pokemon) => {
+            const pokemonID = pokemon.url.split("/")[6]
+            return pokemonID.startsWith(searchTerm)
+        })
+    } else if (nameFilter.checked) {
+        filteredPokemons = allPokemons.filter((pokemon) => {
+            pokemon.name.toLocaleLowerCase().startsWith(searchTerm)
+        })
+    } else {
+        filteredPokemons = allPokemons
+    }
+
+    displayPokemons(filteredPokemons)
+
+    if (filteredPokemons.length === 0) {
+        notFoundMessage.computedStyleMap.display = "block"
+    }
+
 }
